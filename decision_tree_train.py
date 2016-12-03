@@ -6,6 +6,7 @@ import copy
 
 
 DATA_SIZE = 25010# #1000#
+EN_FEATURE_EXTRACT = True
 
 def perform_training(max_depth,train_X,train_Y):
 	for i in range(20):
@@ -73,6 +74,8 @@ def cards_sort(cards):
 			k = k + 2
 
 def extract_features(cards):
+	if not EN_FEATURE_EXTRACT:
+		return cards
 	features = []
 	suits = []
 	card_nos = []
@@ -133,7 +136,7 @@ for i in range(len(val_data[:])):
 
 f_train = open('train_error.csv','w')
 f_val = open('val_error.csv','w')
-for max_depth in range(1,40,1):
+for max_depth in range(1,50,1):
 	clf = perform_training(max_depth,train_X,train_Y)
 	print('max_depth : '+str(max_depth)+', validation score : '+str(calc_Score(clf,val_data)))
 	print('max_depth : '+str(max_depth)+', training score : '+str(calc_Score(clf,train_data)))
