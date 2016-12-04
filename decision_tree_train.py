@@ -2,7 +2,6 @@ import csv
 from sklearn import tree
 import numpy as np
 from sklearn.cross_validation import train_test_split
-import copy
 
 
 DATA_SIZE = 25010# #1000#
@@ -36,6 +35,9 @@ def calc_Score(clf,data):
 		expected = Y[i]
 		if(pred == expected):
 			countPos = countPos + 1
+		# else:
+		# 	print('Wrongly predicted')
+		# 	print(data[:][i])
 		count = count + 1
 	score = countPos/count
 	return score
@@ -94,80 +96,56 @@ def extract_features(cards):
 	return features
 
 
-data = [[0 for x in range(11)] for y in range(DATA_SIZE)]
-i = 0
-with open('train.csv', 'r') as csvfile:
-	reader = csv.reader(csvfile, delimiter=',')
-	for row in reader:
-		for j in range(0, 11):
-			data[:][i][j] = int(row[j])
-		i = i + 1
-		if(i >= DATA_SIZE):
-			break
+def train_dec_tree():
+	data = [[0 for x in range(11)] for y in range(DATA_SIZE)]
+	i = 0
+	with open('train.csv', 'r') as csvfile:
+		reader = csv.reader(csvfile, delimiter=',')
+		for row in reader:
+			for j in range(0, 11):
+				data[:][i][j] = int(row[j])
+			i = i + 1
+			if(i >= DATA_SIZE):
+				break
 
-train_data, val_data = train_test_split(data, test_size = 0.2, random_state=0)
+	train_data, val_data = train_test_split(data, test_size = 0.2, random_state=0)
 
-train_X = [[0 for x in range(10)] for y in range(len(train_data[:]))]
-for i in range(len(train_data[:])):
-	train_X[i] = train_data[:][i][:-1]
-	# print('************')
-	# print(train_X[:][i])
-	features = extract_features(train_X[:][i])
-	train_X[i] = features
-	# #del train_X[:][i][9]
-	# print(train_X[i])
-	# print(features)
-	# print('************')
+	train_X = [[0 for x in range(10)] for y in range(len(train_data[:]))]
+	for i in range(len(train_data[:])):
+		train_X[i] = train_data[:][i][:-1]
+		# print('************')
+		# print(train_X[:][i])
+		features = extract_features(train_X[:][i])
+		train_X[i] = features
+		# #del train_X[:][i][9]
+		# print(train_X[i])
+		# print(features)
+		# print('************')
 
-train_Y = [0 for x in range(len(train_data[:]))]
-for i in range(len(train_data[:])):
-	train_Y[i] = train_data[:][i][10]
-
-
-val_X = [[0 for x in range(10)] for y in range(len(val_data[:]))]
-for i in range(len(val_data[:])):
-	val_X[i] = val_data[:][i][:-1]
-	val_X[:][i] = extract_features(val_X[:][i])
-	#del val_X[:][i][9]
-
-val_Y = [0 for x in range(len(val_data[:]))]
-for i in range(len(val_data[:])):
-	val_Y[i] = val_data[:][i][10]
-
-f_train = open('train_error.csv','w')
-f_val = open('val_error.csv','w')
-for max_depth in range(1,50,1):
-	clf = perform_training(max_depth,train_X,train_Y)
-	print('max_depth : '+str(max_depth)+', validation score : '+str(calc_Score(clf,val_data)))
-	print('max_depth : '+str(max_depth)+', training score : '+str(calc_Score(clf,train_data)))
-	f_train.write(str(max_depth)+','+str(1-calc_Score(clf,train_data))+'\n')
-	f_val.write(str(max_depth)+','+str(1-calc_Score(clf,val_data))+'\n')
-f_train.close()
-f_val.close()
-
-test_input = [1,11,4,1,3,7,4,11,2,1]
-print(test_input)
-test_input = extract_features(test_input)
-print(2)
-print(clf.predict(np.asarray(test_input).reshape(1,-1)))
-
-test_input = [2,9,3,7,1,13,2,13,1,2]
-test_input = extract_features(test_input)
-print(test_input)
-print(1)
-print(clf.predict(np.asarray(test_input).reshape(1,-1)))
-
-test_input = [4,7,3,5,2,3,1,4,4,13]
-test_input = extract_features(test_input)
-print(test_input)
-print(0)
-print(clf.predict(np.asarray(test_input).reshape(1,-1)))
+	train_Y = [0 for x in range(len(train_data[:]))]
+	for i in range(len(train_data[:])):
+		train_Y[i] = train_data[:][i][10]
 
 
-test_input = [3,11,1,10,4,5,1,11,4,11]
-test_input = extract_features(test_input)
-print(test_input)
-print(3)
-print(clf.predict(np.asarray(test_input).reshape(1,-1)))
+	val_X = [[0 for x in range(10)] for y in range(len(val_data[:]))]
+	for i in range(len(val_data[:])):
+		val_X[i] = val_data[:][i][:-1]
+		val_X[:][i] = extract_features(val_X[:][i])
+		#del val_X[:][i][9]
 
+	val_Y = [0 for x in range(len(val_data[:]))]
+	for i in range(len(val_data[:])):
+		val_Y[i] = val_data[:][i][10]
 
+	# f_train = open('train_error.csv','w')
+	# f_val = open('val_error.csv','w')
+	for max_depth in range(20,21,1):
+		clf = perform_training(max_depth,train_X,train_Y)
+		print('max_depth : '+str(max_depth)+', validation score : '+str(calc_Score(clf,val_data)))
+		print('max_depth : '+str(max_depth)+', training score : '+str(calc_Score(clf,train_data)))
+		# f_train.write(str(max_depth)+','+str(1-calc_Score(clf,train_data))+'\n')
+		# f_val.write(str(max_depth)+','+str(1-calc_Score(clf,val_data))+'\n')
+	# f_train.close()
+	# f_val.close()
+
+	return clf
